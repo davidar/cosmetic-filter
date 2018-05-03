@@ -1,0 +1,27 @@
+{
+  "name": "cosmetic-filter",
+  "version": "0.1.0",
+  "description": "Basic cosmetic / element hiding filtering",
+  "main": "index.js",
+  "scripts": {
+    "publish-please": "publish-please",
+    "test": "standard"
+  },
+  "author": "David A Roberts",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8 <10"
+  },
+  "dependencies": {
+    "ad-block": "^3.1.11",
+    "tldjs": "^2.3.1"
+  },
+  "devDependencies": {
+    "publish-please": "^2.4.1",
+    "standard": "^11.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davidar/cosmetic-filter.git"
+  }
+}

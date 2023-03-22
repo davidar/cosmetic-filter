@@ -9,16 +9,12 @@
   },
   "author": "David A Roberts",
   "license": "MIT",
-  "engines": {
-    "node": ">=8 <10"
-  },
   "dependencies": {
-    "ad-block": "^3.1.11",
+    "adblock-rs": "^0.7.7",
     "tldjs": "^2.3.1"
   },
   "devDependencies": {
-    "publish-please": "^2.4.1",
-    "standard": "^11.0.1"
+    "standard": "^17.0.0"
   },
   "repository": {
     "type": "git",

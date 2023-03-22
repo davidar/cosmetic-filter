@@ -1,5 +1,5 @@
 'use strict'
-const {AdBlockClient, FilterOptions} = require('ad-block')
+const adblockRust = require('adblock-rs')
 const fs = require('fs')
 const path = require('path')
 const tldjs = require('tldjs')
@@ -14,33 +14,25 @@ class FilterList {
     this.ids = new Set()
     this.selectors = []
     this.domainSelectors = {}
-    this.client = new AdBlockClient()
+    this.filterSet = new adblockRust.FilterSet(true)
+    this.engine = new adblockRust.Engine(this.filterSet, true)
   }
 
-  load (fname, ruleFilter = (x => x)) {
-    let rules = fs.readFileSync(fname, 'ascii')
+  load (fname, ruleFilter = x => x) {
+    const rules = fs.readFileSync(fname, 'ascii')
     for (const line of rules.split('\n')) this.addRule(ruleFilter(line))
-
-    fname = fname + '.dat'
-    if (fs.existsSync(fname)) {
-      this.client.deserialize(fs.readFileSync(fname))
-    } else {
-      console.error('parsing rules')
-      this.client.parse(rules)
-      console.error('serialising rules')
-      fs.writeFileSync(fname, this.client.serialize())
-    }
   }
 
-  loadEasyList (ruleFilter = (x => x)) {
+  loadEasyList (ruleFilter = x => x) {
     this.load(path.join(__dirname, 'easylist', 'easylist.txt'), ruleFilter)
     this.load(path.join(__dirname, 'easylist', 'fanboy-annoyance.txt'), ruleFilter)
   }
 
   addRule (line) {
+    if (line) this.filterSet.addFilter(line)
     // TODO: parse exception rules
     if (!line || !line.includes('##') || line.match(/#[@?]#/)) return
-    let [domains, selector] = line.split('##', 2) // cosmetic filters
+    const [domains, selector] = line.split('##', 2) // cosmetic filters
 
     if (domains === '') { // generic filter
       if (selector.startsWith('.')) {
@@ -76,15 +68,15 @@ class FilterList {
       }
     }
 
-    let domain = tldjs.getDomain(href)
+    const domain = tldjs.getDomain(href)
     if (this.domainSelectors[domain]) {
       removeNodes(body.querySelectorAll(this.domainSelectors[domain].join()))
     }
 
     forEachR(body.getElementsByTagName('img'), image => {
-      if (this.client.matches(image.src, FilterOptions.image, domain)) removeNode(image)
+      if (this.engine.check(image.src, domain, 'image', true)) removeNode(image)
     })
   }
 }
 
-module.exports = {FilterList}
+module.exports = { FilterList }
